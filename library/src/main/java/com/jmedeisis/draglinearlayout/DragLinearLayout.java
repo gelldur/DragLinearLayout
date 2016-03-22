@@ -265,13 +265,28 @@ public class DragLinearLayout extends LinearLayout {
      * Makes the child a candidate for dragging. Must be an existing child of this layout.
      */
     public void setViewDraggable(View child, View dragHandle) {
-        if (null == child || null == dragHandle) {
-            throw new IllegalArgumentException(
-                "Draggable children and their drag handles must not be null.");
+        setViewDraggable(child, dragHandle, new DragHandleOnTouchListener(child));
+    }
+
+    public void setViewDraggable(View child, View dragHandle, OnTouchListener dragTouchHandle) {
+        if (null == dragHandle) {
+            throw new IllegalArgumentException("Draggable children and their drag handles must not be null.");
         }
-        
+
         if (this == child.getParent()) {
-            dragHandle.setOnTouchListener(new DragHandleOnTouchListener(child));
+            dragHandle.setOnTouchListener(dragTouchHandle);
+            trackViewDraggable(child);
+        } else {
+            Log.e(LOG_TAG, child + " is not a child, cannot make draggable.");
+        }
+    }
+
+    public void trackViewDraggable(View child) {
+        if (null == child) {
+            throw new IllegalArgumentException("Draggable children and their drag handles must not be null.");
+        }
+
+        if (this == child.getParent()) {
             draggableChildren.put(indexOfChild(child), new DraggableChild());
         } else {
             Log.e(LOG_TAG, child + " is not a child, cannot make draggable.");
@@ -352,7 +367,7 @@ public class DragLinearLayout extends LinearLayout {
      * Initiates a new {@link #draggedItem} unless the current one is still
      * {@link com.jmedeisis.draglinearlayout.DragLinearLayout.DragItem#detecting}.
      */
-    private void startDetectingDrag(View child) {
+    public void startDetectingDrag(View child) {
         if (draggedItem.detecting)
             return; // existing drag in process, only one at a time is allowed
 
