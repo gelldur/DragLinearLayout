@@ -380,6 +380,7 @@ public class DragLinearLayout extends LinearLayout {
         if (containerScrollView != null) {
             containerScrollView.requestDisallowInterceptTouchEvent(true);
         }
+        startDrag();
     }
 
     private void startDrag() {
@@ -391,7 +392,6 @@ public class DragLinearLayout extends LinearLayout {
         }
 
         draggedItem.onDragStart();
-        requestDisallowInterceptTouchEvent(true);
     }
 
     /**
@@ -662,7 +662,7 @@ public class DragLinearLayout extends LinearLayout {
                 final float y = MotionEventCompat.getY(event, pointerIndex);
                 final float dy = y - downY;
                 if (Math.abs(dy) > slop) {
-                    startDrag();
+                    requestDisallowInterceptTouchEvent(true);
                     return true;
                 }
                 return false;
@@ -692,6 +692,7 @@ public class DragLinearLayout extends LinearLayout {
             case MotionEvent.ACTION_DOWN: {
                 if (!draggedItem.detecting || draggedItem.settling()) return false;
                 startDrag();
+                requestDisallowInterceptTouchEvent(true);
                 return true;
             }
             case MotionEvent.ACTION_MOVE: {
